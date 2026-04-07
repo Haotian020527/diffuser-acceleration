@@ -1,0 +1,30 @@
+name: UNetModel
+
+d_x: 0 # placeholder
+d_model: 512
+time_embed_mult: 2
+nblocks: 4
+resblock_dropout: 0.0
+transformer_num_heads: 8
+transformer_dim_head: 64
+transformer_dropout: 0.1
+transformer_depth: 1
+transformer_mult_ff: 2
+context_dim: 512
+use_position_embedding: false # for input x
+
+# If you need to use a pre-trained scene encoder, both pretrained_weights and freeze_scene_model parameters need to be modified
+scene_model:
+  name: PointTransformer
+  use_color: ${task.datamodule.use_color}
+  use_normal: ${task.datamodule.use_normal}
+  num_scene_points: ${task.datamodule.num_scene_points}
+  num_agent_points: ${task.datamodule.num_agent_points}
+  num_object_points: ${eval:'${task.datamodule.num_object_points} if "${task.type}" != "goal-reach" else 0'}
+  num_placement_area_points: ${eval:'${task.datamodule.num_placement_area_points} if "${task.type}" == "place" else 0'}
+  num_target_points: ${eval:'${task.datamodule.num_target_points} if "${task.type}" == "goal-reach" else 0'}
+  num_points: ${eval:'${model.scene_model.num_scene_points} + ${model.scene_model.num_object_points} + ${model.scene_model.num_placement_area_points} 
+              + ${model.scene_model.num_target_points}'}
+  pretrained_weights: null
+  pretrained_weights_slurm: null
+freeze_scene_model: false

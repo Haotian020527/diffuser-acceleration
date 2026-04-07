@@ -1,0 +1,24 @@
+name: MKMotionPolicyPlanner
+
+scale: 1.0
+scale_type: 'div_var' # ['normal', 'div_var']
+
+grasp_energy: false
+grasp_energy_weight: 1.0
+grasp_energy_type: 'all_frame' # ['last_frame', 'all_frame', 'all_frame_exp']
+grasp_energy_model: 'grasp_dif_multi' # ['grasp_dif_multi', 'partial_grasp_dif', 'grasp_dif_mugs']
+grasp_gripper_type: 'robotiq' # ['robotiq', 'panda']
+grasp_energy_lowerlimit: -150
+place_energy: false
+place_energy_weight: 1.0
+place_extra_height: 0.0
+place_energy_method: 'sided_distance' # ['chamfer_distance', 'sided_distance']
+place_energy_type: 'all_frame' # ['last_frame', 'all_frame', 'all_frame_exp']
+goal_reach_energy: false
+goal_reach_energy_weight: 1.0
+goal_reach_energy_method: 'chamfer_distance' # ['chamfer_distance', 'sided_distance', 'points_distance']
+goal_reach_energy_type: 'all_frame' # ['last_frame', 'all_frame', 'all_frame_exp']
+
+clip_grad_by_value:
+  min: -0.1
+  max: 0.1

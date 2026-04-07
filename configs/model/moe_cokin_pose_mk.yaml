@@ -1,0 +1,33 @@
+name: MoECoKinUNetModel
+
+# pose branch: end-effector pose trajectory [x,y,z,qx,qy,qz,qw]
+branch: pose
+d_x: 7
+d_model: 512
+nblocks: 4
+context_dim: 512
+use_position_embedding: false
+
+transformer_num_heads: 8
+transformer_dropout: 0.1
+
+# MoE-CoKin block settings
+noise_emb_dim: 1024
+num_experts: 8
+top_k: 2
+expert_hidden_dim: 2048
+moe_dropout: 0.1
+
+scene_model:
+  name: PointTransformer
+  use_color: ${task.datamodule.use_color}
+  use_normal: ${task.datamodule.use_normal}
+  num_scene_points: ${task.datamodule.num_scene_points}
+  num_agent_points: ${task.datamodule.num_agent_points}
+  num_object_points: ${eval:'${task.datamodule.num_object_points} if "${task.type}" != "goal-reach" else 0'}
+  num_placement_area_points: ${eval:'${task.datamodule.num_placement_area_points} if "${task.type}" == "place" else 0'}
+  num_target_points: ${eval:'${task.datamodule.num_target_points} if "${task.type}" == "goal-reach" else 0'}
+  num_points: ${eval:'${task.datamodule.num_scene_points} + (${task.datamodule.num_object_points} if "${task.type}" != "goal-reach" else 0) + (${task.datamodule.num_placement_area_points} if "${task.type}" == "place" else 0) + (${task.datamodule.num_target_points} if "${task.type}" == "goal-reach" else 0)'}
+  pretrained_weights: null
+  pretrained_weights_slurm: null
+freeze_scene_model: false

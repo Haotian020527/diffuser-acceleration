@@ -1,0 +1,24 @@
+name: MotionPolicyNetworks
+
+d_x: 0
+lr: ${task.lr}
+
+scene_model:
+  name: "PointNets"
+  num_scene_points: ${task.datamodule.num_scene_points}
+  num_agent_points: ${task.datamodule.num_agent_points}
+  num_object_points: ${eval:'${task.datamodule.num_object_points} if "${task.type}" != "goal-reach" else 0'}
+  num_placement_area_points: ${eval:'${task.datamodule.num_placement_area_points} if "${task.type}" == "place" else 0'}
+  num_target_points: ${eval:'${task.datamodule.num_target_points} if "${task.type}" == "goal-reach" else 0'}
+  num_points: ${eval:'${model.scene_model.num_scene_points} + ${model.scene_model.num_agent_points} + ${model.scene_model.num_object_points} + 
+              ${model.scene_model.num_placement_area_points} + ${model.scene_model.num_target_points}'}
+
+loss:
+  collision_loss: true
+  collision_loss_weight: 5.0
+  point_match_loss: true
+  # NOTE：Since the kinematic chain error of the agent is transmitted from the base link to 
+  # the end effector link, when calculating point match loss, the weight calculated by the 
+  # link at the end of the agent should be greater.
+  point_match_ratio: [2, 3, 5] # base_pc_num:arm_pc_num:gripper_pc_num
+  point_match_loss_weight: 1.0

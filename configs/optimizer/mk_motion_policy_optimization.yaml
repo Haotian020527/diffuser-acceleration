@@ -1,0 +1,22 @@
+name: MKMotionPolicyOptimizer
+
+scale: 1.0
+scale_type: 'normal' # ['normal', 'div_var']
+
+collision: false
+collision_weight: 1.0
+collision_margin: 0.05
+joint_limits: false
+joint_limits_weight: 1.0
+joint_limits_threshold: 0.98
+action_limit: false
+action_limit_weight: 1.0
+action_limit_step: 10
+smoothness: false
+smoothness_weight: 1.0
+
+clip_grad_by_value:
+  min: -0.1
+  max: 0.1
+
+

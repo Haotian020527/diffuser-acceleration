@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+dataset/
+checkpoints/
+wandb/
+*.log
+.vscode/
+refine-logs/
+env_model/
+*.egg-info/

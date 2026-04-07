@@ -1,0 +1,57 @@
+name: ConsistencyCoupledKinematicsDiffuser
+timesteps: 100
+schedule_cfg:
+  beta: [0.0001, 0.01]
+  beta_schedule: 'linear'
+  s: 0.008
+lr: ${task.lr}
+
+rand_t_type: 'half' # 'half' or 'all'
+loss_type: 'l2' # 'l1' or 'l2'
+
+shared_timestep: true
+pose_diff_weight: 1.0
+joint_diff_weight: 1.0
+consistency_weight: 1.0
+
+detach_pose_for_consistency: false
+detach_joint_for_consistency: false
+ignore_observation_in_consistency: true
+
+# If batch has no `pose_x`, build pose target from joint GT through FK.
+auto_pose_target_from_joint: true
+pose_target_dim: 7
+pose_quat_format: "xyzw"
+
+# Joint trajectory in this repo is normalized to [-1, 1].
+joint_unnormalize_for_fk: true
+joint_norm_range: [-1.0, 1.0]
+joint_limits:
+  - [-6.0, 6.0]
+  - [-6.0, 6.0]
+  - [-3.141592653589793, 3.141592653589793]
+  - [-3.141592653589793, 3.141592653589793]
+  - [-2.24, 2.24]
+  - [-3.141592653589793, 3.141592653589793]
+  - [-2.57, 2.57]
+  - [-3.141592653589793, 3.141592653589793]
+  - [-2.09, 2.09]
+  - [-3.141592653589793, 3.141592653589793]
+
+pose:
+  x_key: "pose_x"
+  # no observation injection for pose branch by default
+  start_key: null
+  obser_key: null
+
+joint:
+  x_key: "x"
+  start_key: "start"
+  obser_key: "obser"
+
+fk:
+  enabled: true
+  type: "torch_urdf"
+  # null -> use MecKinova default URDF from env.agent.mec_kinova
+  urdf_path: null
+  eef_frame: "end_effector_link"

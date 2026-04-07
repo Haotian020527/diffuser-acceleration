@@ -1,0 +1,21 @@
+name: DDPM
+timesteps: 100
+schedule_cfg:
+  beta: [0.0001, 0.01]
+  beta_schedule: 'linear'
+  s: 0.008
+lr: ${task.lr}
+
+sample:
+  converage:
+    optimization: true
+    planning: true
+    ksteps: 1 # If it's too small, the agent's trajectory will skip frames
+  fine_tune:
+    optimization: true
+    planning: true
+    timesteps: 50
+    ksteps: 1 # If it's too small, the agent's trajectory will skip frames
+
+rand_t_type: 'half' # 'half' or 'all'
+loss_type: 'l2' # 'l1' or 'l2'
