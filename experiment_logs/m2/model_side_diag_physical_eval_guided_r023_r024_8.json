@@ -1,0 +1,142 @@
+[
+  {
+    "name": "CoKin_R023_guide8",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R023-CoKin-NoCons-Patch/2026-04-09-16-01-19/last.ckpt",
+    "max_items": 8,
+    "evaluated_items": 8,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 87.5,
+      "total": 8,
+      "skips": 0,
+      "time": [
+        6.136457579476493,
+        0.2810481483294427
+      ],
+      "step time": [
+        0.12032269763679396,
+        0.005510748006459663
+      ],
+      "env collision": 12.5,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 12.5,
+      "average collision depth": 1.5369240201804732,
+      "median collision depth": 1.4104067714039092,
+      "is smooth": 100.0,
+      "average config sparc": -8.332088151064042,
+      "average eff sparc": -8.23444898299978,
+      "eff position path length": [
+        14.57170201455789,
+        4.062295027487571
+      ],
+      "eff orientation path length": [
+        590.72900805468,
+        313.8577517238653
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 87.5,
+        "total": 8,
+        "skips": 0,
+        "time": [
+          6.136457579476493,
+          0.2810481483294427
+        ],
+        "step time": [
+          0.12032269763679396,
+          0.005510748006459663
+        ],
+        "env collision": 12.5,
+        "self collision": 0.0,
+        "joint violation": 0.0,
+        "physical violations": 12.5,
+        "average collision depth": 1.5369240201804732,
+        "median collision depth": 1.4104067714039092,
+        "is smooth": 100.0,
+        "average config sparc": -8.332088151064042,
+        "average eff sparc": -8.23444898299978,
+        "eff position path length": [
+          14.57170201455789,
+          4.062295027487571
+        ],
+        "eff orientation path length": [
+          590.72900805468,
+          313.8577517238653
+        ]
+      }
+    }
+  },
+  {
+    "name": "CoKin_R024_guide8",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R024-CoKin-ConsDetachJoint/2026-04-09-16-23-05/last.ckpt",
+    "max_items": 8,
+    "evaluated_items": 8,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 87.5,
+      "total": 8,
+      "skips": 0,
+      "time": [
+        6.350417171205793,
+        0.28133350379956523
+      ],
+      "step time": [
+        0.12451798374913318,
+        0.005516343211756181
+      ],
+      "env collision": 12.5,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 12.5,
+      "average collision depth": 0.20139584017603543,
+      "median collision depth": 0.09967989261900098,
+      "is smooth": 100.0,
+      "average config sparc": -7.032061863810828,
+      "average eff sparc": -6.891811236831474,
+      "eff position path length": [
+        17.286624268209554,
+        3.0380812252629092
+      ],
+      "eff orientation path length": [
+        675.6919127738381,
+        195.9353278949377
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 87.5,
+        "total": 8,
+        "skips": 0,
+        "time": [
+          6.350417171205793,
+          0.28133350379956523
+        ],
+        "step time": [
+          0.12451798374913318,
+          0.005516343211756181
+        ],
+        "env collision": 12.5,
+        "self collision": 0.0,
+        "joint violation": 0.0,
+        "physical violations": 12.5,
+        "average collision depth": 0.20139584017603543,
+        "median collision depth": 0.09967989261900098,
+        "is smooth": 100.0,
+        "average config sparc": -7.032061863810828,
+        "average eff sparc": -6.891811236831474,
+        "eff position path length": [
+          17.286624268209554,
+          3.0380812252629092
+        ],
+        "eff orientation path length": [
+          675.6919127738381,
+          195.9353278949377
+        ]
+      }
+    }
+  }
+]

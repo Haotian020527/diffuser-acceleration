@@ -1,0 +1,17 @@
+{
+    "all": {
+        "% Success": "0.00",
+        "% With Environment Collision": "100.00",
+        "% With Self Collision": "100.00",
+        "% With Joint Limit Violations": "100.00",
+        "Average Collision Depth (cm)": "6.243533161016805",
+        "Median Collision Depth (cm)": "3.5215578829304803",
+        "Average Config SPARC": "-3.87",
+        "Average End Eff SPARC": "-4.60",
+        "% Smooth": "100.00",
+        "Average End Eff Position Path Length": "0.00 \u00b1 0.00",
+        "Average End Eff Orientation Path Length": " 0.00 \u00b1 0.00",
+        "Average Time": "0.00 \u00b1 0.00",
+        "Average Time Per Step (Not Always Valuable)": " 0.000000 \u00b1 0.000000"
+    }
+}

@@ -1,0 +1,196 @@
+[
+  {
+    "name": "DDPM_ref",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/MK-M2Diffuser-Goal-Reach/2024-07-14-09-38-10/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 0.02205915394006297,
+        "std": 0.0015895678962748296
+      }
+    }
+  },
+  {
+    "name": "CoKin_R004_Dense",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M1-R004-DenseCoKin/2026-04-09-00-45-57/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 3.6801649890840054,
+        "std": 0.081232877108119
+      },
+      "pose_diff_loss": {
+        "mean": 1.0688263848423958,
+        "std": 0.014499775605369412
+      },
+      "joint_diff_loss": {
+        "mean": 1.1841574404388666,
+        "std": 0.011463823714347357
+      },
+      "consistency_loss": {
+        "mean": 1.427181189879775,
+        "std": 0.07637129453555573
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  {
+    "name": "CoKin_R007_FAdapter",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R007-CoKin-FAdapter/2026-04-09-10-36-28/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 3.409249681979418,
+        "std": 0.07987812474078096
+      },
+      "pose_diff_loss": {
+        "mean": 1.0708968546241522,
+        "std": 0.014236153596682321
+      },
+      "joint_diff_loss": {
+        "mean": 1.0514844208955765,
+        "std": 0.013213036454668587
+      },
+      "consistency_loss": {
+        "mean": 1.286868378520012,
+        "std": 0.0718534519370083
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  {
+    "name": "CoKin_RandomInit",
+    "ckpt": "<random_init>",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 3.562386229634285,
+        "std": 0.09062579433241073
+      },
+      "pose_diff_loss": {
+        "mean": 1.1310209799557924,
+        "std": 0.015786580090026047
+      },
+      "joint_diff_loss": {
+        "mean": 1.118255676701665,
+        "std": 0.013956117105456316
+      },
+      "consistency_loss": {
+        "mean": 1.3131095506250858,
+        "std": 0.08655972084785746
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  {
+    "name": "CoKin_R021_NoCons",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R021-CoKin-NoCons/diag-20260409-1518/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 2.257050681859255,
+        "std": 0.021098545185658436
+      },
+      "pose_diff_loss": {
+        "mean": 1.0649619083851576,
+        "std": 0.013749957327799272
+      },
+      "joint_diff_loss": {
+        "mean": 1.192088769748807,
+        "std": 0.015205965563377298
+      },
+      "consistency_loss": {
+        "mean": 1.450211713090539,
+        "std": 0.07838960039229527
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  {
+    "name": "DDPM_R022_32demo",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R022-DDPM-32demo/diag-20260409-1531/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 0.03772739798296243,
+        "std": 0.0042800942747319515
+      }
+    }
+  }
+]

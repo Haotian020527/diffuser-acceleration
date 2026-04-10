@@ -123,10 +123,22 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         self.consistency_weight = float(cfg.get("consistency_weight", 1.0))
         self.pose_lb_weight = float(cfg.get("pose_lb_weight", 0.0))
         self.joint_lb_weight = float(cfg.get("joint_lb_weight", 0.0))
+        self.low_band_anchor_weight = float(cfg.get("low_band_anchor_weight", 0.0))
+        self.band_leak_weight = float(cfg.get("band_leak_weight", 0.0))
+        self.anchor_pose_weight = float(cfg.get("anchor_pose_weight", 1.0))
+        self.anchor_joint_weight = float(cfg.get("anchor_joint_weight", 1.0))
 
         self.detach_pose_for_consistency = bool(cfg.get("detach_pose_for_consistency", False))
         self.detach_joint_for_consistency = bool(cfg.get("detach_joint_for_consistency", False))
         self.ignore_observation_in_consistency = bool(cfg.get("ignore_observation_in_consistency", True))
+        self.skip_consistency_when_weight_zero = bool(
+            cfg.get("skip_consistency_when_weight_zero", True)
+        )
+        self.consistency_joint_clamp = bool(cfg.get("consistency_joint_clamp", True))
+        consistency_joint_clamp_range = cfg.get("consistency_joint_clamp_range", [-1.0, 1.0])
+        self.consistency_joint_min = float(consistency_joint_clamp_range[0])
+        self.consistency_joint_max = float(consistency_joint_clamp_range[1])
+        self.consistency_safe_nan_to_num = bool(cfg.get("consistency_safe_nan_to_num", True))
 
         # If pose GT is absent, derive it from joint GT via FK.
         self.auto_pose_target_from_joint = bool(cfg.get("auto_pose_target_from_joint", True))
@@ -154,6 +166,20 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         if loss_type not in ("l1", "l2"):
             raise ValueError(f"Unsupported loss type: {loss_type}")
         self.loss_type = loss_type
+
+        # Sampling/guidance compatibility with DDPM-style inference entrypoints.
+        sample_cfg = cfg.get("sample", None)
+        converage_cfg = sample_cfg.get("converage", {}) if sample_cfg is not None else {}
+        fine_tune_cfg = sample_cfg.get("fine_tune", {}) if sample_cfg is not None else {}
+        self.converage_opt = bool(converage_cfg.get("optimization", False))
+        self.converage_plan = bool(converage_cfg.get("planning", False))
+        self.converage_ksteps = int(converage_cfg.get("ksteps", 1))
+        self.fine_tune_opt = bool(fine_tune_cfg.get("optimization", False))
+        self.fine_tune_plan = bool(fine_tune_cfg.get("planning", False))
+        self.fine_tune_timesteps = int(fine_tune_cfg.get("timesteps", 0))
+        self.fine_tune_ksteps = int(fine_tune_cfg.get("ksteps", 1))
+        self.optimizer = None
+        self.planner = None
 
         # Try to build FK from config when no external FK model is passed.
         if self.fk_model is None:
@@ -245,13 +271,14 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         ts: torch.Tensor,
         data: Dict[str, torch.Tensor],
         condition_key: Optional[str],
+        cond: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Optional[Any]]:
-        if condition_key is not None and condition_key in data:
-            cond = data[condition_key]
-        elif hasattr(eps_model, "condition"):
-            cond = eps_model.condition(data)
-        else:
-            cond = None
+        if cond is None:
+            cond = self._resolve_condition(
+                eps_model=eps_model,
+                data=data,
+                condition_key=condition_key,
+            )
 
         output: Any
         if cond is None:
@@ -271,6 +298,18 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         if not torch.is_tensor(output):
             raise ValueError("eps_model output must be Tensor or (Tensor, route).")
         return output, route
+
+    def _resolve_condition(
+        self,
+        eps_model: nn.Module,
+        data: Dict[str, torch.Tensor],
+        condition_key: Optional[str],
+    ) -> Optional[torch.Tensor]:
+        if condition_key is not None and condition_key in data:
+            return data[condition_key]
+        if hasattr(eps_model, "condition"):
+            return eps_model.condition(data)
+        return None
 
     def _load_balance_loss(self, route: Optional[Any]) -> torch.Tensor:
         if route is None:
@@ -539,6 +578,11 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         noise = torch.randn_like(x0, device=self.device)
         x_t = self.q_sample(x0=x0, t=ts, noise=noise)
         x_t = self._apply_observation(x_t, data, start_key=start_key, obser_key=obser_key)
+        cond = self._resolve_condition(
+            eps_model=eps_model,
+            data=data,
+            condition_key=condition_key,
+        )
 
         pred_noise, route = self._predict_eps(
             eps_model=eps_model,
@@ -546,6 +590,7 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
             ts=ts,
             data=data,
             condition_key=condition_key,
+            cond=cond,
         )
         pred_noise = self._apply_observation(
             pred_noise, data, start_key=start_key, obser_key=obser_key
@@ -555,12 +600,39 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         pred_x0 = self._apply_observation(pred_x0, data, start_key=start_key, obser_key=obser_key)
 
         diff_loss = self._diff_loss(pred_noise, noise)
+        low_anchor_loss = pred_noise.new_zeros(())
+        band_leak_loss = pred_noise.new_zeros(())
+
+        if self.low_band_anchor_weight > 0.0 and hasattr(eps_model, "forward_backbone"):
+            with torch.no_grad():
+                if cond is None:
+                    teacher_noise = eps_model.forward_backbone(x_t, ts)
+                else:
+                    teacher_noise = eps_model.forward_backbone(x_t, ts, cond)
+                teacher_noise = self._apply_observation(
+                    teacher_noise, data, start_key=start_key, obser_key=obser_key
+                )
+            if hasattr(eps_model, "low_frequency_component"):
+                pred_low = eps_model.low_frequency_component(pred_noise)
+                teacher_low = eps_model.low_frequency_component(teacher_noise)
+            else:
+                pred_low = pred_noise
+                teacher_low = teacher_noise
+            low_anchor_loss = self._diff_loss(pred_low, teacher_low)
+
+        if self.band_leak_weight > 0.0 and hasattr(eps_model, "latest_band_leak_loss"):
+            band_loss = eps_model.latest_band_leak_loss
+            if torch.is_tensor(band_loss):
+                band_leak_loss = band_loss.to(dtype=pred_noise.dtype, device=pred_noise.device)
+
         return {
             "x_t": x_t,
             "noise": noise,
             "pred_noise": pred_noise,
             "pred_x0": pred_x0,
             "diff_loss": diff_loss,
+            "low_anchor_loss": low_anchor_loss,
+            "band_leak_loss": band_leak_loss,
             "route": route,
         }
 
@@ -617,28 +689,60 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         pred_pose_x0 = pose_out["pred_x0"]
         pred_joint_x0 = joint_out["pred_x0"]
 
-        if self.detach_pose_for_consistency:
-            pred_pose_x0 = pred_pose_x0.detach()
-        if self.detach_joint_for_consistency:
-            pred_joint_x0 = pred_joint_x0.detach()
+        consistency_loss = pred_joint_x0.new_zeros(())
+        skip_consistency = (
+            self.skip_consistency_when_weight_zero and self.consistency_weight <= 0.0
+        )
+        if not skip_consistency:
+            pred_pose_cons = pred_pose_x0.detach() if self.detach_pose_for_consistency else pred_pose_x0
+            pred_joint_cons = (
+                pred_joint_x0.detach() if self.detach_joint_for_consistency else pred_joint_x0
+            )
+            if self.consistency_joint_clamp:
+                pred_joint_cons = pred_joint_cons.clamp(
+                    min=self.consistency_joint_min,
+                    max=self.consistency_joint_max,
+                )
 
-        pred_joint_fk_input = self._joint_to_fk_input(pred_joint_x0)
-        pred_pose_from_joint = self._run_fk(pred_joint_fk_input)
-        pred_pose_from_joint = self._fk_to_reference_repr(pred_pose_from_joint, pred_pose_x0)
+            pred_joint_fk_input = self._joint_to_fk_input(pred_joint_cons)
+            pred_pose_from_joint = self._run_fk(pred_joint_fk_input)
+            pred_pose_from_joint = self._fk_to_reference_repr(pred_pose_from_joint, pred_pose_cons)
 
-        consist_mask = self._build_consistency_mask(pred_pose_x0, data)
-        consistency_loss = self._masked_loss(pred_pose_x0, pred_pose_from_joint, consist_mask)
+            if self.consistency_safe_nan_to_num:
+                pred_pose_cons = torch.nan_to_num(pred_pose_cons, nan=0.0, posinf=0.0, neginf=0.0)
+                pred_pose_from_joint = torch.nan_to_num(
+                    pred_pose_from_joint, nan=0.0, posinf=0.0, neginf=0.0
+                )
+
+            consist_mask = self._build_consistency_mask(pred_pose_cons, data)
+            consistency_loss = self._masked_loss(pred_pose_cons, pred_pose_from_joint, consist_mask)
+            if self.consistency_safe_nan_to_num:
+                consistency_loss = torch.nan_to_num(
+                    consistency_loss, nan=0.0, posinf=1e4, neginf=1e4
+                )
 
         pose_diff_loss = pose_out["diff_loss"]
         joint_diff_loss = joint_out["diff_loss"]
         pose_lb_loss = self._load_balance_loss(pose_out.get("route", None))
         joint_lb_loss = self._load_balance_loss(joint_out.get("route", None))
+        pose_anchor_loss = pose_out.get("low_anchor_loss", pose_diff_loss.new_zeros(()))
+        joint_anchor_loss = joint_out.get("low_anchor_loss", joint_diff_loss.new_zeros(()))
+        pose_band_leak_loss = pose_out.get("band_leak_loss", pose_diff_loss.new_zeros(()))
+        joint_band_leak_loss = joint_out.get("band_leak_loss", joint_diff_loss.new_zeros(()))
+
+        anchor_loss = (
+            self.anchor_pose_weight * pose_anchor_loss
+            + self.anchor_joint_weight * joint_anchor_loss
+        )
+        band_leak_loss = pose_band_leak_loss + joint_band_leak_loss
         total_loss = (
             self.pose_diff_weight * pose_diff_loss
             + self.joint_diff_weight * joint_diff_loss
             + self.consistency_weight * consistency_loss
             + self.pose_lb_weight * pose_lb_loss
             + self.joint_lb_weight * joint_lb_loss
+            + self.low_band_anchor_weight * anchor_loss
+            + self.band_leak_weight * band_leak_loss
         )
 
         return {
@@ -648,7 +752,170 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
             "consistency_loss": consistency_loss,
             "pose_lb_loss": pose_lb_loss,
             "joint_lb_loss": joint_lb_loss,
+            "pose_anchor_loss": pose_anchor_loss,
+            "joint_anchor_loss": joint_anchor_loss,
+            "band_leak_loss": band_leak_loss,
         }
+
+    def set_optimizer(self, optimizer: Any) -> None:
+        self.optimizer = optimizer
+
+    def set_planner(self, planner: Any) -> None:
+        self.planner = planner
+
+    def _apply_joint_observation(
+        self, x_t: torch.Tensor, data: Dict[str, torch.Tensor]
+    ) -> torch.Tensor:
+        return self._apply_observation(
+            x_t,
+            data,
+            start_key=self.joint_start_key,
+            obser_key=self.joint_obser_key,
+        )
+
+    def _predict_joint_noise(
+        self,
+        x_t: torch.Tensor,
+        t: torch.Tensor,
+        data: Dict[str, torch.Tensor],
+        cond: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        if cond is None:
+            if self.joint_condition_key is not None and self.joint_condition_key in data:
+                cond = data[self.joint_condition_key]
+            elif hasattr(self.joint_eps_model, "condition"):
+                cond = self.joint_eps_model.condition(data)
+
+        if cond is None:
+            output = self.joint_eps_model(x_t, t)
+        else:
+            output = self.joint_eps_model(x_t, t, cond)
+
+        if isinstance(output, tuple):
+            output = output[0]
+        if not torch.is_tensor(output):
+            raise ValueError("joint_eps_model output must be Tensor or (Tensor, route).")
+        return output
+
+    def p_mean_variance_joint(
+        self,
+        x_t: torch.Tensor,
+        t: torch.Tensor,
+        data: Dict[str, torch.Tensor],
+        cond: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        pred_noise = self._predict_joint_noise(x_t=x_t, t=t, data=data, cond=cond)
+        pred_x0 = self.predict_x0_from_noise(x_t=x_t, t=t, pred_noise=pred_noise)
+
+        model_mean = (
+            _reshape_timestep_buffer(self.posterior_mean_coef1, t, x_t) * pred_x0
+            + _reshape_timestep_buffer(self.posterior_mean_coef2, t, x_t) * x_t
+        )
+        posterior_variance = _reshape_timestep_buffer(self.posterior_variance, t, x_t)
+        posterior_log_variance = _reshape_timestep_buffer(
+            self.posterior_log_variance_clipped, t, x_t
+        )
+        return model_mean, posterior_variance, posterior_log_variance
+
+    @torch.no_grad()
+    def p_sample(
+        self,
+        x_t: torch.Tensor,
+        t: int,
+        data: Dict[str, torch.Tensor],
+        cond: Optional[torch.Tensor] = None,
+        opt: bool = False,
+        plan: bool = False,
+    ) -> torch.Tensor:
+        batch = x_t.shape[0]
+        ts = torch.full((batch,), t, device=self.device, dtype=torch.long)
+        model_mean, model_variance, model_log_variance = self.p_mean_variance_joint(
+            x_t=x_t,
+            t=ts,
+            data=data,
+            cond=cond,
+        )
+        noise = torch.randn_like(x_t) if t > 0 else 0.0
+
+        if self.optimizer is not None and opt:
+            gradient = self.optimizer.gradient(model_mean, data, model_variance)
+            model_mean = model_mean + gradient
+        if self.planner is not None and plan:
+            gradient = self.planner.gradient(model_mean, data, model_variance)
+            model_mean = model_mean + gradient
+
+        return model_mean + (0.5 * model_log_variance).exp() * noise
+
+    @torch.no_grad()
+    def p_sample_loop(self, data: Dict[str, torch.Tensor]) -> torch.Tensor:
+        if self.joint_x_key not in data:
+            raise KeyError(f"Missing joint target key '{self.joint_x_key}' for sampling.")
+
+        x_t = torch.randn_like(data[self.joint_x_key], device=self.device)
+        x_t = self._apply_joint_observation(x_t, data)
+        all_x_t = [x_t]
+
+        cond = None
+        if self.joint_condition_key is not None and self.joint_condition_key in data:
+            cond = data[self.joint_condition_key]
+        elif hasattr(self.joint_eps_model, "condition"):
+            cond = self.joint_eps_model.condition(data)
+
+        for t in reversed(range(0, self.timesteps)):
+            for _ in range(self.converage_ksteps):
+                x_t = self.p_sample(
+                    x_t=x_t,
+                    t=t,
+                    data=data,
+                    cond=cond,
+                    opt=self.converage_opt,
+                    plan=self.converage_plan,
+                )
+                x_t = self._apply_joint_observation(x_t, data)
+                all_x_t.append(x_t)
+
+        for _ in reversed(range(0, self.fine_tune_timesteps)):
+            for _ in range(self.fine_tune_ksteps):
+                x_t = self.p_sample(
+                    x_t=x_t,
+                    t=0,
+                    data=data,
+                    cond=cond,
+                    opt=self.fine_tune_opt,
+                    plan=self.fine_tune_plan,
+                )
+                x_t = self._apply_joint_observation(x_t, data)
+                all_x_t.append(x_t)
+
+        return torch.stack(all_x_t, dim=1)
+
+    @torch.no_grad()
+    def sample(self, data: Dict[str, torch.Tensor], k: int = 1) -> torch.Tensor:
+        ksamples = []
+        for _ in range(k):
+            ksamples.append(self.p_sample_loop(data))
+        ksamples = torch.stack(ksamples, dim=1)
+
+        observe_len = 0
+        if self.has_observation and self.joint_start_key is not None and self.joint_start_key in data:
+            observe_len = data[self.joint_start_key].shape[1]
+
+        if "normalizer" in data and data["normalizer"] is not None:
+            ksamples[..., observe_len:, :] = data["normalizer"].unnormalize(
+                ksamples[..., observe_len:, :]
+            )
+        if "repr_type" in data:
+            if data["repr_type"] == "absolute":
+                pass
+            elif data["repr_type"] == "relative":
+                start_idx = max(observe_len, 1)
+                ksamples[..., start_idx - 1 :, :] = torch.cumsum(
+                    ksamples[..., start_idx - 1 :, :], dim=-2
+                )
+            else:
+                raise ValueError("Unsupported repr type.")
+
+        return ksamples
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
         params = [p for p in self.parameters() if p.requires_grad]
@@ -664,6 +931,9 @@ class ConsistencyCoupledKinematicsDiffuser(pl.LightningModule):
         self.log("train/loss_consistency", losses["consistency_loss"])
         self.log("train/loss_pose_lb", losses["pose_lb_loss"])
         self.log("train/loss_joint_lb", losses["joint_lb_loss"])
+        self.log("train/loss_pose_anchor", losses["pose_anchor_loss"])
+        self.log("train/loss_joint_anchor", losses["joint_anchor_loss"])
+        self.log("train/loss_band_leak", losses["band_leak_loss"])
         return losses["loss"]
 
     def validation_step(  # type: ignore[override]

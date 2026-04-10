@@ -34,11 +34,23 @@ def run_inference(config: DictConfig) -> None:
 
     ## create meckinova motion policy test environment
     env = create_enviroment(config.task.environment)
+    max_eval_items = int(config.get("max_eval_items", -1))
+    clamp_before_unnorm = bool(config.get("clamp_before_unnorm", False))
+    skip_world_transform = bool(config.get("skip_world_transform", False))
+    traj_scale = float(
+        OmegaConf.select(
+            config,
+            "traj_scale",
+            default=OmegaConf.select(config, "diffuser.sample.traj_scale", default=1.0),
+        )
+    )
 
     ## inference
     with torch.no_grad():
         mdl.eval()
         for i, data in enumerate(dl):
+            if max_eval_items > 0 and i >= max_eval_items:
+                break
             # if i > 621:
             #     continue
             for key in data:
@@ -51,9 +63,15 @@ def run_inference(config: DictConfig) -> None:
 
             ## the agent trajectory is moved from the center of the scene point cloud to the agent initial frame
             traj_norm_a = outputs[:, -1, -1, :, :]
-            # traj_unorm_a = MecKinova.unnormalize_joints(torch.clamp(traj_norm_a, min=-1, max=1))
+            if clamp_before_unnorm:
+                traj_norm_a = torch.clamp(traj_norm_a, min=-1.0, max=1.0)
+            if traj_scale != 1.0:
+                traj_norm_a = traj_norm_a * traj_scale
             traj_unorm_a = MecKinova.unnormalize_joints(traj_norm_a)
-            traj_unorm_a = transform_trajectory_torch(traj_unorm_a, torch.inverse(data['trans_mat']), -data['rot_angle'])
+            if not skip_world_transform:
+                traj_unorm_a = transform_trajectory_torch(
+                    traj_unorm_a, torch.inverse(data['trans_mat']), -data['rot_angle']
+                )
             traj_unorm_a = traj_unorm_a.squeeze(0).clone().detach().cpu().numpy()
             
             ## evaluate trajectory

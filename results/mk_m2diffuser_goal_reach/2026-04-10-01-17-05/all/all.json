@@ -1,0 +1,40 @@
+{
+    "goal-reach": {
+        "collision_depths": [
+            []
+        ],
+        "collision": [
+            false
+        ],
+        "joint_limit_violation": [
+            false
+        ],
+        "self_collision": [
+            false
+        ],
+        "physical_violations": [
+            false
+        ],
+        "config_smoothness": [
+            -5.721644437051968
+        ],
+        "eff_smoothness": [
+            -5.741816675727445
+        ],
+        "eff_position_path_length": [
+            33.916482048209055
+        ],
+        "eff_orientation_path_length": [
+            1148.2099479281608
+        ],
+        "physical_success": [
+            true
+        ],
+        "time": [
+            0.8484036922454834
+        ],
+        "num_steps": [
+            51
+        ]
+    }
+}

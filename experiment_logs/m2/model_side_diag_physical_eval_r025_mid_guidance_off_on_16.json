@@ -1,0 +1,70 @@
+[
+  {
+    "guidance_on": false,
+    "n": 16,
+    "overall": {
+      "physical_success": 0.0,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        NaN,
+        NaN
+      ],
+      "step time": [
+        NaN,
+        NaN
+      ],
+      "env collision": 100.0,
+      "self collision": 6.25,
+      "joint violation": 18.75,
+      "physical violations": 100.0,
+      "average collision depth": 6.9248804829998525,
+      "median collision depth": 4.444412820617827,
+      "is smooth": 100.0,
+      "average config sparc": -3.5725717657938283,
+      "average eff sparc": -4.235093028733291,
+      "eff position path length": [
+        NaN,
+        NaN
+      ],
+      "eff orientation path length": [
+        NaN,
+        NaN
+      ]
+    }
+  },
+  {
+    "guidance_on": true,
+    "n": 16,
+    "overall": {
+      "physical_success": 87.5,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        0.6452159200395856,
+        0.32705427553805394
+      ],
+      "step time": [
+        0.012651292549795797,
+        0.006412828932118705
+      ],
+      "env collision": 12.5,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 12.5,
+      "average collision depth": 2.187435212069654,
+      "median collision depth": 2.246856839988904,
+      "is smooth": 100.0,
+      "average config sparc": -5.77154186431757,
+      "average eff sparc": -5.827756221813285,
+      "eff position path length": [
+        34.80266916134722,
+        5.117365249654663
+      ],
+      "eff orientation path length": [
+        1623.376995625025,
+        305.7582405890432
+      ]
+    }
+  }
+]

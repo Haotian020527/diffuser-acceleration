@@ -157,6 +157,108 @@ def resolve_resume_checkpoint(config: DictConfig) -> Optional[str]:
     return None
 
 
+def resolve_init_checkpoint(config: DictConfig) -> Optional[str]:
+    init_cfg = config.get("init_from_checkpoint", None)
+    if init_cfg is None:
+        return None
+
+    if isinstance(init_cfg, bool):
+        if not init_cfg:
+            return None
+        pl.utilities.rank_zero_warn(
+            "init_from_checkpoint=true requires a checkpoint file or directory path. "
+            "Initialization is skipped."
+        )
+        return None
+
+    init_text = str(init_cfg).strip()
+    parsed_bool = _as_bool_string(init_text)
+    if parsed_bool is False:
+        return None
+    if parsed_bool is True:
+        pl.utilities.rank_zero_warn(
+            "init_from_checkpoint must point to a checkpoint file or directory. "
+            f"Received {init_cfg!r}; initialization is skipped."
+        )
+        return None
+
+    candidate = _resolve_path(init_text)
+    if candidate.is_file() and candidate.suffix == ".ckpt":
+        pl.utilities.rank_zero_info(f"Initializing weights from checkpoint file: {candidate}")
+        return str(candidate)
+    if candidate.is_dir():
+        ckpt = _find_latest_checkpoint([candidate])
+        if ckpt is not None:
+            pl.utilities.rank_zero_info(f"Initializing weights from latest checkpoint in dir: {ckpt}")
+            return str(ckpt)
+
+    pl.utilities.rank_zero_warn(
+        f"init_from_checkpoint path not found or invalid: {candidate}. Initialization is skipped."
+    )
+    return None
+
+
+def _preview_keys(keys: List[str], limit: int = 5) -> str:
+    if len(keys) == 0:
+        return ""
+    preview = ", ".join(keys[:limit])
+    if len(keys) > limit:
+        preview += ", ..."
+    return preview
+
+
+def initialize_matching_weights(module: torch.nn.Module, checkpoint_path: str) -> None:
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    state_dict = checkpoint.get("state_dict", checkpoint)
+    if not isinstance(state_dict, dict):
+        raise TypeError(
+            f"Checkpoint at {checkpoint_path} does not contain a valid state_dict. "
+            f"Found type={type(state_dict)}."
+        )
+
+    module_state = module.state_dict()
+    matched_state: Dict[str, Any] = {}
+    unexpected_keys: List[str] = []
+    shape_mismatch_keys: List[str] = []
+
+    for key, value in state_dict.items():
+        if key not in module_state:
+            unexpected_keys.append(key)
+            continue
+        if not torch.is_tensor(value):
+            shape_mismatch_keys.append(f"{key}(non-tensor)")
+            continue
+        if tuple(module_state[key].shape) != tuple(value.shape):
+            shape_mismatch_keys.append(
+                f"{key}{tuple(value.shape)}->{tuple(module_state[key].shape)}"
+            )
+            continue
+        matched_state[key] = value
+
+    if len(matched_state) == 0:
+        pl.utilities.rank_zero_warn(
+            f"No compatible weights found when initializing from {checkpoint_path}."
+        )
+        return
+
+    module.load_state_dict(matched_state, strict=False)
+
+    missing_keys = [key for key in module_state.keys() if key not in matched_state]
+    pl.utilities.rank_zero_info(
+        "Initialized matching weights from checkpoint: "
+        f"loaded={len(matched_state)} missing={len(missing_keys)} "
+        f"unexpected={len(unexpected_keys)} shape_mismatch={len(shape_mismatch_keys)}"
+    )
+    if unexpected_keys:
+        pl.utilities.rank_zero_warn(
+            f"Ignored unexpected checkpoint keys: {_preview_keys(unexpected_keys)}"
+        )
+    if shape_mismatch_keys:
+        pl.utilities.rank_zero_warn(
+            f"Ignored shape-mismatched checkpoint keys: {_preview_keys(shape_mismatch_keys)}"
+        )
+
+
 def setup_trainer(
     gpus: Union[int, List[int]], 
     save_checkpoint: bool, 
@@ -287,13 +389,23 @@ def run_training(config: DictConfig) -> None:
     ## dataloader length (used by transformer)
     train_dataloader_len = len(dm.get_train_dataloader())
 
+    resume_ckpt_path = resolve_resume_checkpoint(config)
+    init_ckpt_path = resolve_init_checkpoint(config)
+
     ## create model and optimizer
     mdl = create_model(config, slurm=config.slurm)
     mdl.train_dataloader_len = train_dataloader_len
 
+    if resume_ckpt_path is not None and init_ckpt_path is not None:
+        pl.utilities.rank_zero_warn(
+            "Both resume_from_checkpoint and init_from_checkpoint are set. "
+            "Ignoring init_from_checkpoint because resume will restore the full training state."
+        )
+    elif init_ckpt_path is not None:
+        initialize_matching_weights(mdl, init_ckpt_path)
+
     if logger is not None:
         logger.watch(mdl, log="gradients", log_freq=100)
-    resume_ckpt_path = resolve_resume_checkpoint(config)
     trainer.fit(model=mdl, datamodule=dm, ckpt_path=resume_ckpt_path)
 
 

@@ -24,6 +24,7 @@ gpus: [0, 1, 2, 3]
 no_logging: false
 no_checkpointing: false
 resume_from_checkpoint: null
+init_from_checkpoint: null
 
 save_model_interval: 1
 save_model_seperately: false

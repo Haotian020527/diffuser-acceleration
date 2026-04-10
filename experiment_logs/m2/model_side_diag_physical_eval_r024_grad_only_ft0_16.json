@@ -1,0 +1,34 @@
+{
+  "name": "R024_grad_only_ft0",
+  "n": 16,
+  "overall": {
+    "physical_success": 0.0,
+    "total": 16,
+    "skips": 0,
+    "time": [
+      NaN,
+      NaN
+    ],
+    "step time": [
+      NaN,
+      NaN
+    ],
+    "env collision": 100.0,
+    "self collision": 18.75,
+    "joint violation": 31.25,
+    "physical violations": 100.0,
+    "average collision depth": 7.410777015194407,
+    "median collision depth": 4.716164623063414,
+    "is smooth": 100.0,
+    "average config sparc": -3.589218062656238,
+    "average eff sparc": -4.253266707821812,
+    "eff position path length": [
+      NaN,
+      NaN
+    ],
+    "eff orientation path length": [
+      NaN,
+      NaN
+    ]
+  }
+}

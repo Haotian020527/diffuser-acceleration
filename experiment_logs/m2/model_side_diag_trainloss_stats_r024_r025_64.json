@@ -1,0 +1,88 @@
+[
+  {
+    "name": "CoKin_R024_ConsDetachJoint",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R024-CoKin-ConsDetachJoint/2026-04-09-16-23-05/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 0.3067981372587383,
+        "std": 0.012830596351691604
+      },
+      "pose_diff_loss": {
+        "mean": 0.15718664275482297,
+        "std": 0.007921050877158962
+      },
+      "joint_diff_loss": {
+        "mean": 0.08773367793764919,
+        "std": 0.006132398372375918
+      },
+      "consistency_loss": {
+        "mean": 0.06187781604239717,
+        "std": 0.0033115856303771343
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  {
+    "name": "CoKin_R025_ContinueR024",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R025-CoKin-Continue-R024/2026-04-09-19-24-37/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 0.2676585237495601,
+        "std": 0.007128201201435382
+      },
+      "pose_diff_loss": {
+        "mean": 0.13870633603073657,
+        "std": 0.00571929055316547
+      },
+      "joint_diff_loss": {
+        "mean": 0.07545877899974585,
+        "std": 0.003683702251330614
+      },
+      "consistency_loss": {
+        "mean": 0.05349340901011601,
+        "std": 0.0032220471660449374
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  }
+]

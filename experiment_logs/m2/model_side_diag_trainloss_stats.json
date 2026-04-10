@@ -1,0 +1,99 @@
+[
+  {
+    "name": "DDPM_ref",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/MK-M2Diffuser-Goal-Reach/2024-07-14-09-38-10/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 0.02205915394006297,
+        "std": 0.0015895678962748296
+      }
+    }
+  },
+  {
+    "name": "CoKin_R004_Dense",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M1-R004-DenseCoKin/2026-04-09-00-45-57/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 3.6801649890840054,
+        "std": 0.081232877108119
+      },
+      "pose_diff_loss": {
+        "mean": 1.0688263848423958,
+        "std": 0.014499775605369412
+      },
+      "joint_diff_loss": {
+        "mean": 1.1841574404388666,
+        "std": 0.011463823714347357
+      },
+      "consistency_loss": {
+        "mean": 1.427181189879775,
+        "std": 0.07637129453555573
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  },
+  {
+    "name": "CoKin_R007_FAdapter",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R007-CoKin-FAdapter/2026-04-09-10-36-28/last.ckpt",
+    "n_repeat": 64,
+    "loss_stats": {
+      "loss": {
+        "mean": 3.409249681979418,
+        "std": 0.07987812474078096
+      },
+      "pose_diff_loss": {
+        "mean": 1.0708968546241522,
+        "std": 0.014236153596682321
+      },
+      "joint_diff_loss": {
+        "mean": 1.0514844208955765,
+        "std": 0.013213036454668587
+      },
+      "consistency_loss": {
+        "mean": 1.286868378520012,
+        "std": 0.0718534519370083
+      },
+      "pose_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_lb_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "pose_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "joint_anchor_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "band_leak_loss": {
+        "mean": 0.0,
+        "std": 0.0
+      }
+    }
+  }
+]

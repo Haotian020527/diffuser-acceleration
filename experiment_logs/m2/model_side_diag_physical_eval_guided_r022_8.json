@@ -1,0 +1,72 @@
+[
+  {
+    "name": "DDPM_R022_guide8",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R022-DDPM-32demo/diag-20260409-1531/last.ckpt",
+    "max_items": 8,
+    "evaluated_items": 8,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 75.0,
+      "total": 8,
+      "skips": 0,
+      "time": [
+        6.361374894777934,
+        0.43670620819550054
+      ],
+      "step time": [
+        0.12473284107407712,
+        0.008562866827362752
+      ],
+      "env collision": 25.0,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 25.0,
+      "average collision depth": 1.8426170976254357,
+      "median collision depth": 1.451295428791825,
+      "is smooth": 100.0,
+      "average config sparc": -5.357927970201225,
+      "average eff sparc": -5.705444024192213,
+      "eff position path length": [
+        2.9947792252809484,
+        0.3642526418835273
+      ],
+      "eff orientation path length": [
+        102.62003471706619,
+        21.99812134646707
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 75.0,
+        "total": 8,
+        "skips": 0,
+        "time": [
+          6.361374894777934,
+          0.43670620819550054
+        ],
+        "step time": [
+          0.12473284107407712,
+          0.008562866827362752
+        ],
+        "env collision": 25.0,
+        "self collision": 0.0,
+        "joint violation": 0.0,
+        "physical violations": 25.0,
+        "average collision depth": 1.8426170976254357,
+        "median collision depth": 1.451295428791825,
+        "is smooth": 100.0,
+        "average config sparc": -5.357927970201225,
+        "average eff sparc": -5.705444024192213,
+        "eff position path length": [
+          2.9947792252809484,
+          0.3642526418835273
+        ],
+        "eff orientation path length": [
+          102.62003471706619,
+          21.99812134646707
+        ]
+      }
+    }
+  }
+]

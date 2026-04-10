@@ -1,0 +1,83 @@
+[
+  {
+    "name": "CoKin_R025_ContinueR024",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R025-CoKin-Continue-R024/2026-04-09-19-24-37/last.ckpt",
+    "max_items": -1,
+    "evaluated_items": 1020,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "guidance_mode": "off",
+    "traj_scale": 1.0,
+    "effective_guidance": {
+      "converage_opt": false,
+      "converage_plan": false,
+      "converage_ksteps": 1,
+      "fine_tune_opt": false,
+      "fine_tune_plan": false,
+      "fine_tune_timesteps": 50,
+      "fine_tune_ksteps": 1
+    },
+    "overall_metrics": {
+      "physical_success": 57.450980392156865,
+      "total": 1020,
+      "skips": 0,
+      "time": [
+        0.48095375238425087,
+        0.2109109223131119
+      ],
+      "step time": [
+        0.009430465733024527,
+        0.0041355082806492525
+      ],
+      "env collision": 42.549019607843135,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 42.549019607843135,
+      "average collision depth": 5.7353896844006425,
+      "median collision depth": 4.205426274367258,
+      "is smooth": 100.0,
+      "average config sparc": -5.844123869553178,
+      "average eff sparc": -5.937635983980143,
+      "eff position path length": [
+        38.60419260164672,
+        7.763603270022128
+      ],
+      "eff orientation path length": [
+        1610.0366915197492,
+        434.5114126600287
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 57.450980392156865,
+        "total": 1020,
+        "skips": 0,
+        "time": [
+          0.48095375238425087,
+          0.2109109223131119
+        ],
+        "step time": [
+          0.009430465733024527,
+          0.0041355082806492525
+        ],
+        "env collision": 42.549019607843135,
+        "self collision": 0.0,
+        "joint violation": 0.0,
+        "physical violations": 42.549019607843135,
+        "average collision depth": 5.7353896844006425,
+        "median collision depth": 4.205426274367258,
+        "is smooth": 100.0,
+        "average config sparc": -5.844123869553178,
+        "average eff sparc": -5.937635983980143,
+        "eff position path length": [
+          38.60419260164672,
+          7.763603270022128
+        ],
+        "eff orientation path length": [
+          1610.0366915197492,
+          434.5114126600287
+        ]
+      }
+    }
+  }
+]

@@ -6,6 +6,18 @@ schedule_cfg:
   s: 0.008
 lr: ${task.lr}
 
+sample:
+  traj_scale: 1.0
+  converage:
+    optimization: true
+    planning: true
+    ksteps: 1 # If it's too small, the agent's trajectory will skip frames
+  fine_tune:
+    optimization: true
+    planning: true
+    timesteps: 50
+    ksteps: 1 # If it's too small, the agent's trajectory will skip frames
+
 rand_t_type: 'half' # 'half' or 'all'
 loss_type: 'l2' # 'l1' or 'l2'
 
@@ -17,6 +29,10 @@ consistency_weight: 1.0
 detach_pose_for_consistency: false
 detach_joint_for_consistency: false
 ignore_observation_in_consistency: true
+skip_consistency_when_weight_zero: true
+consistency_joint_clamp: true
+consistency_joint_clamp_range: [-1.0, 1.0]
+consistency_safe_nan_to_num: true
 
 # If batch has no `pose_x`, build pose target from joint GT through FK.
 auto_pose_target_from_joint: true

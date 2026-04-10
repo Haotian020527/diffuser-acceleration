@@ -1,0 +1,422 @@
+[
+  {
+    "name": "DDPM_ref",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/MK-M2Diffuser-Goal-Reach/2024-07-14-09-38-10/last.ckpt",
+    "max_items": 16,
+    "evaluated_items": 16,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 87.5,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        0.5449212108339582,
+        0.2564757135610134
+      ],
+      "step time": [
+        0.010684729624195257,
+        0.005028935560019871
+      ],
+      "env collision": 12.5,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 12.5,
+      "average collision depth": 1.5215802763176502,
+      "median collision depth": 1.2754712277784241,
+      "is smooth": 100.0,
+      "average config sparc": -2.6507420220069253,
+      "average eff sparc": -2.3262269993913707,
+      "eff position path length": [
+        2.5133922278025738,
+        0.4054759787095312
+      ],
+      "eff orientation path length": [
+        153.90066460305687,
+        45.05615100696519
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 87.5,
+        "total": 16,
+        "skips": 0,
+        "time": [
+          0.5449212108339582,
+          0.2564757135610134
+        ],
+        "step time": [
+          0.010684729624195257,
+          0.005028935560019871
+        ],
+        "env collision": 12.5,
+        "self collision": 0.0,
+        "joint violation": 0.0,
+        "physical violations": 12.5,
+        "average collision depth": 1.5215802763176502,
+        "median collision depth": 1.2754712277784241,
+        "is smooth": 100.0,
+        "average config sparc": -2.6507420220069253,
+        "average eff sparc": -2.3262269993913707,
+        "eff position path length": [
+          2.5133922278025738,
+          0.4054759787095312
+        ],
+        "eff orientation path length": [
+          153.90066460305687,
+          45.05615100696519
+        ]
+      }
+    }
+  },
+  {
+    "name": "CoKin_R004_Dense",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M1-R004-DenseCoKin/2026-04-09-00-45-57/last.ckpt",
+    "max_items": 16,
+    "evaluated_items": 16,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 0.0,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        NaN,
+        NaN
+      ],
+      "step time": [
+        NaN,
+        NaN
+      ],
+      "env collision": 100.0,
+      "self collision": 100.0,
+      "joint violation": 100.0,
+      "physical violations": 100.0,
+      "average collision depth": 6.800236020766535,
+      "median collision depth": 4.217915989849428,
+      "is smooth": 100.0,
+      "average config sparc": -3.7478168469371456,
+      "average eff sparc": -4.6420089813475975,
+      "eff position path length": [
+        NaN,
+        NaN
+      ],
+      "eff orientation path length": [
+        NaN,
+        NaN
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 0.0,
+        "total": 16,
+        "skips": 0,
+        "time": [
+          NaN,
+          NaN
+        ],
+        "step time": [
+          NaN,
+          NaN
+        ],
+        "env collision": 100.0,
+        "self collision": 100.0,
+        "joint violation": 100.0,
+        "physical violations": 100.0,
+        "average collision depth": 6.800236020766535,
+        "median collision depth": 4.217915989849428,
+        "is smooth": 100.0,
+        "average config sparc": -3.7478168469371456,
+        "average eff sparc": -4.6420089813475975,
+        "eff position path length": [
+          NaN,
+          NaN
+        ],
+        "eff orientation path length": [
+          NaN,
+          NaN
+        ]
+      }
+    }
+  },
+  {
+    "name": "CoKin_R021_NoCons_old",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R021-CoKin-NoCons/diag-20260409-1518/last.ckpt",
+    "max_items": 16,
+    "evaluated_items": 16,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 0.0,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        NaN,
+        NaN
+      ],
+      "step time": [
+        NaN,
+        NaN
+      ],
+      "env collision": 100.0,
+      "self collision": 100.0,
+      "joint violation": 100.0,
+      "physical violations": 100.0,
+      "average collision depth": 6.404601208537714,
+      "median collision depth": 3.9707940682426237,
+      "is smooth": 100.0,
+      "average config sparc": -3.7258406210845507,
+      "average eff sparc": -4.587292687589113,
+      "eff position path length": [
+        NaN,
+        NaN
+      ],
+      "eff orientation path length": [
+        NaN,
+        NaN
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 0.0,
+        "total": 16,
+        "skips": 0,
+        "time": [
+          NaN,
+          NaN
+        ],
+        "step time": [
+          NaN,
+          NaN
+        ],
+        "env collision": 100.0,
+        "self collision": 100.0,
+        "joint violation": 100.0,
+        "physical violations": 100.0,
+        "average collision depth": 6.404601208537714,
+        "median collision depth": 3.9707940682426237,
+        "is smooth": 100.0,
+        "average config sparc": -3.7258406210845507,
+        "average eff sparc": -4.587292687589113,
+        "eff position path length": [
+          NaN,
+          NaN
+        ],
+        "eff orientation path length": [
+          NaN,
+          NaN
+        ]
+      }
+    }
+  },
+  {
+    "name": "CoKin_R023_NoCons_patch",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R023-CoKin-NoCons-Patch/2026-04-09-16-01-19/last.ckpt",
+    "max_items": 16,
+    "evaluated_items": 16,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 0.0,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        NaN,
+        NaN
+      ],
+      "step time": [
+        NaN,
+        NaN
+      ],
+      "env collision": 100.0,
+      "self collision": 0.0,
+      "joint violation": 6.25,
+      "physical violations": 100.0,
+      "average collision depth": 6.9305413296403255,
+      "median collision depth": 4.17689766550324,
+      "is smooth": 100.0,
+      "average config sparc": -3.7886818603957435,
+      "average eff sparc": -4.70503195581111,
+      "eff position path length": [
+        NaN,
+        NaN
+      ],
+      "eff orientation path length": [
+        NaN,
+        NaN
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 0.0,
+        "total": 16,
+        "skips": 0,
+        "time": [
+          NaN,
+          NaN
+        ],
+        "step time": [
+          NaN,
+          NaN
+        ],
+        "env collision": 100.0,
+        "self collision": 0.0,
+        "joint violation": 6.25,
+        "physical violations": 100.0,
+        "average collision depth": 6.9305413296403255,
+        "median collision depth": 4.17689766550324,
+        "is smooth": 100.0,
+        "average config sparc": -3.7886818603957435,
+        "average eff sparc": -4.70503195581111,
+        "eff position path length": [
+          NaN,
+          NaN
+        ],
+        "eff orientation path length": [
+          NaN,
+          NaN
+        ]
+      }
+    }
+  },
+  {
+    "name": "CoKin_R024_ConsDetachJoint",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R024-CoKin-ConsDetachJoint/2026-04-09-16-23-05/last.ckpt",
+    "max_items": 16,
+    "evaluated_items": 16,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 0.0,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        NaN,
+        NaN
+      ],
+      "step time": [
+        NaN,
+        NaN
+      ],
+      "env collision": 100.0,
+      "self collision": 18.75,
+      "joint violation": 25.0,
+      "physical violations": 100.0,
+      "average collision depth": 6.969120016794387,
+      "median collision depth": 4.344485761787991,
+      "is smooth": 100.0,
+      "average config sparc": -3.714315527801409,
+      "average eff sparc": -4.60395504747442,
+      "eff position path length": [
+        NaN,
+        NaN
+      ],
+      "eff orientation path length": [
+        NaN,
+        NaN
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 0.0,
+        "total": 16,
+        "skips": 0,
+        "time": [
+          NaN,
+          NaN
+        ],
+        "step time": [
+          NaN,
+          NaN
+        ],
+        "env collision": 100.0,
+        "self collision": 18.75,
+        "joint violation": 25.0,
+        "physical violations": 100.0,
+        "average collision depth": 6.969120016794387,
+        "median collision depth": 4.344485761787991,
+        "is smooth": 100.0,
+        "average config sparc": -3.714315527801409,
+        "average eff sparc": -4.60395504747442,
+        "eff position path length": [
+          NaN,
+          NaN
+        ],
+        "eff orientation path length": [
+          NaN,
+          NaN
+        ]
+      }
+    }
+  },
+  {
+    "name": "DDPM_R022_32demo",
+    "ckpt": "/home/lht/01diffuser-acceleration/checkpoints/M2-R022-DDPM-32demo/diag-20260409-1531/last.ckpt",
+    "max_items": 16,
+    "evaluated_items": 16,
+    "clamp_before_unnorm": false,
+    "skip_world_transform": false,
+    "overall_metrics": {
+      "physical_success": 50.0,
+      "total": 16,
+      "skips": 0,
+      "time": [
+        0.3897291421890259,
+        0.01387648114325666
+      ],
+      "step time": [
+        0.007641747886059331,
+        0.0002720878655540521
+      ],
+      "env collision": 50.0,
+      "self collision": 0.0,
+      "joint violation": 0.0,
+      "physical violations": 50.0,
+      "average collision depth": 2.211048891344221,
+      "median collision depth": 1.5930917662327873,
+      "is smooth": 100.0,
+      "average config sparc": -4.501395661112877,
+      "average eff sparc": -4.416227538585161,
+      "eff position path length": [
+        2.8340420408886158,
+        0.34283574864289906
+      ],
+      "eff orientation path length": [
+        100.09422696182472,
+        20.661844925997173
+      ]
+    },
+    "group_metrics": {
+      "goal-reach": {
+        "physical_success": 50.0,
+        "total": 16,
+        "skips": 0,
+        "time": [
+          0.3897291421890259,
+          0.01387648114325666
+        ],
+        "step time": [
+          0.007641747886059331,
+          0.0002720878655540521
+        ],
+        "env collision": 50.0,
+        "self collision": 0.0,
+        "joint violation": 0.0,
+        "physical violations": 50.0,
+        "average collision depth": 2.211048891344221,
+        "median collision depth": 1.5930917662327873,
+        "is smooth": 100.0,
+        "average config sparc": -4.501395661112877,
+        "average eff sparc": -4.416227538585161,
+        "eff position path length": [
+          2.8340420408886158,
+          0.34283574864289906
+        ],
+        "eff orientation path length": [
+          100.09422696182472,
+          20.661844925997173
+        ]
+      }
+    }
+  }
+]

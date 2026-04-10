@@ -166,8 +166,9 @@ def run_case(
 
     losses = model(batch)
     required_keys = {"loss", "pose_diff_loss", "joint_diff_loss", "consistency_loss"}
-    if set(losses.keys()) != required_keys:
-        raise RuntimeError(f"Unexpected loss keys: {list(losses.keys())}")
+    missing = required_keys - set(losses.keys())
+    if len(missing) > 0:
+        raise RuntimeError(f"Missing required loss keys: {sorted(missing)}; got: {list(losses.keys())}")
 
     for name, val in losses.items():
         if val.ndim != 0:
