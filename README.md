@@ -1,277 +1,212 @@
-# M²Diffuser: Diffusion-based Trajectory Optimization for Mobile Manipulation in 3D Scenes
+非常抱歉之前的格式或排版依然给你带来了困扰。
 
-**IEEE Transactions on Pattern Analysis and Machine Intelligence (T-PAMI) 2025**
+为了确保你能**一次性、零误差地提取所有内容**，以下是完全纯净的整份 README 源码。请直接点击下方代码块右上角的\*\*“复制”\*\*按钮，粘贴到你的 `.md` 文件中即可：
 
-<p align="left">
-    <a href='https://m2diffuser.github.io/assets/paper/M2Diffuser.pdf'>
-      <img src='https://img.shields.io/badge/Paper-PDF-red?style=plastic&logo=adobeacrobatreader&logoColor=red' alt='Paper PDF'>
-    </a>
-    <a href='https://arxiv.org/pdf/2410.11402'>
-      <img src='https://img.shields.io/badge/Paper-arXiv-green?style=plastic&logo=arXiv&logoColor=green' alt='Paper arXiv'>
-    </a>
-    <a href='https://m2diffuser.github.io/'>
-      <img src='https://img.shields.io/badge/Project-Page-blue?style=plastic&logo=Google%20chrome&logoColor=blue' alt='Project Page'>
-    </a>
-    <a href='https://youtu.be/T7kpDifRtfk?si=-R5agRpDM4uJKtuz' target='_blank'>
-      <img src='https://img.shields.io/badge/YouTube-Video-6f42c1?style=plastic&logo=youtube&logoColor=white' alt='YouTube Video'>
-    </a>
-    <a href='https://b23.tv/avOmoz0'>
-      <img src='https://img.shields.io/badge/Bilibili-Video-ff69b4?style=plastic&logo=bilibili&logoColor=white' alt='Bilibili Video'>
-    </a>
-    <a href='https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/tree/main'>
-      <img src='https://img.shields.io/badge/Model-Checkpoints-orange?style=plastic&logo=Google%20Drive&logoColor=orange' alt='Checkpoints'>
-    </a>
+````markdown
+# diffuser-acceleration
+
+<p align="center">
+  <strong>Kinematics-aware diffusion acceleration for mobile manipulation</strong>
 </p>
 
-[Sixu Yan](https://sixu-yan.github.io)<sup>1,2</sup>,
-[Zeyu Zhang](https://zeyuzhang.com/)<sup>2</sup>,
-[Muzhi Han](https://sites.google.com/view/muzhihan)<sup>3</sup>,
-Zaijin Wang<sup>2</sup>,
-[Qi Xie](https://github.com/sudoku77/)<sup>2</sup>,
-Zhitian Li<sup>2,4</sup>,
-Zhehan Li<sup>2,5</sup>,
-[Hangxin Liu](https://liuhx111.github.io/)<sup>2</sup>,
-[Xinggang Wang](https://xwcv.github.io/)<sup>1</sup>,
-[Song-Chun Zhu](https://zhusongchun.net/)<sup>2,6,7</sup>
+<p align="center">
+  <a href="https://github.com/Haotian020527/diffuser-acceleration">
+    <img src="https://img.shields.io/github/stars/Haotian020527/diffuser-acceleration?style=social" alt="GitHub Stars">
+  </a>
+  <a href="https://m2diffuser.github.io/assets/paper/M2Diffuser.pdf">
+    <img src="https://img.shields.io/badge/Paper-T--PAMI%202025-red?style=flat-square" alt="Paper">
+  </a>
+  <a href="https://arxiv.org/pdf/2410.11402">
+    <img src="https://img.shields.io/badge/arXiv-2410.11402-b31b1b?style=flat-square" alt="arXiv">
+  </a>
+  <a href="https://m2diffuser.github.io/">
+    <img src="https://img.shields.io/badge/Project-Page-0a66c2?style=flat-square" alt="Project Page">
+  </a>
+  <br>
+  <img src="https://img.shields.io/badge/Python-3.8-3776AB?style=flat-square" alt="Python">
+  <img src="https://img.shields.io/badge/PyTorch-1.13.1-EE4C2C?style=flat-square" alt="PyTorch">
+  <img src="https://img.shields.io/badge/CUDA-11.6-76B900?style=flat-square" alt="CUDA">
+  <img src="https://img.shields.io/badge/License-Pending-lightgrey?style=flat-square" alt="License">
+</p>
 
-Corresponding authors: Xinggang Wang (xgwang@hust.edu.cn) and Hangxin Liu (liuhx@bigai.ai)
+![teaser](./assests/teaser.jpg)
 
-<sup>1 </sup>HUST,
-<sup>2 </sup>BIGAI,
-<sup>3 </sup>UCLA,
-<sup>4 </sup>BUAA,
-<sup>5 </sup>XDU,
-<sup>6 </sup>PKU,
-<sup>7 </sup>THU
+## 📖 项目简介 (Introduction)
 
-<img src="./assests/teaser.jpg" alt="drawing" width="100%"/>
-<img src="./assests/overview.png" alt="drawing" width="100%"/>
+`diffuser-acceleration` 致力于解决一个现实痛点：扩散模型（Diffusion Models）在轨迹生成任务上表现优异，但 Dense Denoiser 的推理与训练计算成本过高。
 
-## Install Environment
-To reproduce our simulation results, please install your conda environment on a Linux machine equipped with an NVIDIA GPU. M2Diffuser is developed with Python 3.8.18 and has only been tested on Ubuntu 20.04.
+本仓库以核心模块 `moe-cokin` 为基础，将 CoKin 的双空间扩散模型重构为**带有运动学约束的稀疏专家系统（Sparse MoE）**。在最大程度保留轨迹质量与物理一致性的前提下，显著削减无效计算开销。
 
-We recommend using the same CUDA and PyTorch versions as ours (PyTorch 1.13.1 with CUDA 11.6) for compatibility. If you choose to use different versions, please make sure to adjust the corresponding versions of `pytorch-lightning` and `kaolin` in the environment configuration `./setup_env.sh` accordingly.
-```bash
-./setup_env.sh
-```
-Modify the `yourdfpy/urdf.py` file in the yourdfpy package by editing lines `1240–1244`.
-```python
-# delete the original code in the file and replace it with the code below
-new_s = new_s.scaled([geometry.mesh.scale[0], geometry.mesh.scale[1], geometry.mesh.scale[2]])
-```
+> **Note:** 当前公开分支主要聚焦于 MecKinova 的 `goal-reach` 任务。`pick` 与 `place` 任务的预处理及历史资源保留在仓库中，但核心脚本和配置均以 `goal-reach` 任务为入口。
 
-## Download URDF and USD Files
-Please download the robot and scene models, including:
-- [URDF](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/agent_urdf.zip) and [USD](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/agent_usd.zip) files of the robots
-- [URDF](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/physcene_urdf.zip) and [USD](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/physcene_usd.zip) files of the scenes
+---
 
-After downloading, please unzip and place the URDF files of the robots and scenes into the `${your_urdf_model_path}` directory, and update the corresponding paths in `utils/path.py` according to your actual directory structure. The directory path of USD files will be introduced in [here](#evaluate-models).
+## ✨ 核心特性 (Features)
 
-## Pre-process Dataset
-Please download and unzip our [pre-processed dataset](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/dataset.zip), which is pre-processed to be used for model training. It includes three mobile manipulation tasks: `pick`, `place`, and `goal-reach`. The dataset directory is organized as follows:
-```bash
-${your_dataset_path}}/
-├── pick/
-│   ├── 0.npy
-│   ├── 1.npy
-│   └── ...
-├── place/
-│   ├── 0.npy
-│   ├── 1.npy
-│   └── ...
-├── goal-reach/
-│   ├── 0.npy
-│   ├── 1.npy
-│   └── ...
-```
-> Note: for details about the data structure in the `.npy` files, please refer to the comments in `./preprocessing/data_preprocess_pick.py` and `./preprocessing/data_preprocess_place.py` that describe their data components.
+* 🚀 **`moe-cokin` 旗舰加速模块：** 在 Joint 和 Pose 双分支上执行 Paired Sparse Routing，将稠密 FFN 替换为按层激活的 MoE Expert Bank。
+* 🤖 **CoKin 双空间扩散：** 同步建模 10-DoF 关节轨迹与 7D 末端位姿轨迹，并通过可微正向运动学（Differentiable FK）实现一致性耦合。
+* 🛠️ **研究友好的解耦配置：** 基于 Hydra 构建，将 `diffuser`、`pose_model`、`joint_model`、`task`、`optimizer` 与 `planner` 彻底解耦，支持极速实验切换。
+* 🌍 **3D 场景条件建模：** 集成 PointTransformer / PointNet 场景编码器，支持点云场景 Token 注入去噪器。
+* 📊 **完备的基线对比：** 包含 M2Diffuser、MPiNets、MPiFormer 等主流模型实现，便于进行精度、速度与复杂度的全面 Benchmark 对比。
+* 🏗️ **清晰的工程架构：** 提供 PyTorch Lightning 训练框架、脚本化启动、数据模块封装，以及评估与后处理模块的清晰分离。
 
-Alternatively, you may download the [original data](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/original_data.zip) and process it yourself. The data is generated by our previous work—[M3Bench](https://zeyuzhang.com/papers/m3bench/) and [VKC](https://github.com/zyjiao4728/Planning-on-VKC), and includes two tasks: `pick` and `place`. Note that the `goal-reach` task reuses the processed `pick` data, as described in our paper. The original data directory is organized as follow:
-```bash
-${your_original_data_path}/
-├── pick/
-│   ├── ${physcene_name}/
-│   │   ├── ${object_link_name}
-│   │   │   ├── ${time_stamp}
-│   │   │   │   ├── env_config.json
-│   │   │   │   ├── ${pick_exp_id}
-│   │   │   │   │   ├── config.json
-│   │   │   │   │   ├── pick_vkc_return.json
-│   │   │   │   │   ├── vkc_request.json
-│   │   │   │   │   └── trajectory
-│   │   │   │   │       ├── pick_action_relativity.json
-│   │   │   │   │       ├── pick_trajectory_absolute.json
-│   │   │   │   │       ├── pick_trajectory_relativity.json
-│   │   │   │   │       └── pick_vkc_caption_trajectory.json
-│   │   │   │   └── ...
-│   │   │   └── ...
-│   │   └── ...
-│   └── ...
-├── place/
-│   ├── ${physcene_name}/
-│   │   ├── ${object_link_name}
-│   │   │   ├── ${time_stamp}_place
-│   │   │   │   ├── env_config.json
-│   │   │   │   ├── ${place_exp_id}
-│   │   │   │   │   ├── config.json
-│   │   │   │   │   ├── place_vkc_return.json
-│   │   │   │   │   ├── vkc_request.json
-│   │   │   │   │   └── trajectory
-│   │   │   │   │       ├── place_action_relativity.json
-│   │   │   │   │       ├── place_trajectory_absolute.json
-│   │   │   │   │       ├── place_trajectory_relativity.json
-│   │   │   │   │       └── place_vkc_caption_trajectory.json
-│   │   │   │   └── ...
-│   │   │   └── ...
-│   │   └── ...
-│   └── ...
-```
+---
 
-The code for processing the original data is as follows:
+## 🔥 深度解析：moe-cokin (Deep Dive)
 
-```bash
-# pre-process pick data
-python data_preprocess_pick.py --robot MecKinova --task pick --origin_path ${your_original_data_path}/pick --save_path ${your_dataset_path}} --overwrite
+### 什么是 `moe-cokin`？
 
-# pre-process place data
-python data_preprocess_place.py --robot MecKinova --task place --origin_path ${your_original_data_path}/place --save_path ${your_dataset_path}} --overwrite
+`moe-cokin` 是构建在 CoKin (`ConsistencyCoupledKinematicsDiffuser`) 架构之上的稀疏化增强版。有别于传统的单分支 Diffusion Policy，CoKin 是一个**双分支系统**：
+1.  **Joint 分支**：预测机器人关节轨迹。
+2.  **Pose 分支**：预测末端执行器位姿轨迹。
+*(二者通过正向运动学 Forward Kinematics 保持严格的几何一致性。)*
 
-# pre-process the goal-reach data, simply copy the processed `pick` data and rename the directory to `goal-reach`.
-```
-> **Note:** make sure to update the corresponding data paths in the YAML files under the `configs/task` directory, such as `data_dir: ${your_dataset_path}/${task.type}`.
+`moe-cokin` 的核心思想并非盲目增加模型参数，而是**将最昂贵、最可替换的 FFN 层转化为混合专家系统（MoE）**。每一层仅激活最适配的 Expert 组合，而非让所有 Token 均经过全量 Dense 通路。
 
-## Train Models
-Train M2Diffuser, MPiNets, and MPiFormer on the mobile manipulation dataset using the following code. Our codebase supports both single-GPU and multi-GPU training.
-- M2Diffuser training
-```bash
-bash ./scripts/model-m2diffuser/${task_type}/train.sh ${GPU_NUM}
-# e.g., bash ./scripts/model-m2diffuser/pick/train.sh 1
-```
-- MPiNets training
-```bash
-bash ./scripts/model-mpinets/${task_type}/train.sh ${GPU_NUM}
-```
-- MPiFormer training
-```bash
-bash ./scripts/model-mpiformer/${task_type}/train.sh ${GPU_NUM}
-```
-All trained model checkpoints are saved in the `./checkpoints` folder by default. You can also modify the `output_dir: checkpoints` field in `./configs/default.yaml` to change the checkpoint saving path.
+**当前主线链路：**
+```text
+scripts/model-m2diffuser/goal-reach/train.sh (mode=moe_cokin)
+  -> configs/diffuser/cokin_moe.yaml
+  -> models/m2diffuser/cokin_moe.py :: CoKinMoEDiffuser
+  -> models/model/moe_unet.py :: MoEUNetModel + PairedRouter
+````
 
-## Evaluate Models
-Use the following code to evaluate M2Diffuser, MPiNets, and MPiFormer on the mobile manipulation dataset. The evaluation includes: (1) testing physical feasibility (e.g., collision, smoothness) in PyBullet, and (2) verifying task success (e.g., grasping and placement) in NVIDIA Isaac Sim.
+### 运作机制 (How it works)
 
-You can either use your own trained checkpoints or download our [pre-trained models](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/checkpoints.zip) and unzip them into a folder, e.g., `./checkpoints/`.
+`moe-cokin` 并非简单地套用 MoE，而是设计了创新的 **Joint-Pose Paired Routing** 机制。模型不再为两个分支独立挑选 Expert，而是为每一层联合选择一个 `(joint_expert, pose_expert)` 对，确保稀疏路径严格尊重双空间的物理耦合关系。
 
-task|checkpoints|desc
--|-|-
-MK-M2Diffuser-Pick|2024-06-28-20-36-17|M2Diffuser trained on `pick` data
-MK-M2Diffuser-Place|2024-07-21-22-54-33|M2Diffuser trained on `place` data
-MK-M2Diffuser-Goal-Reach|2024-07-14-09-38-10|M2Diffuser trained on `goal-reach` data
-MK-MPiNets-Pick|2024-07-07-09-16-52|MPiNets trained on `pick` data
-MK-MPiNets-Place|2024-07-25-09-30-12|MPiNets trained on `place` data
-MK-MPiNets-Goal-Reach|2024-07-10-16-04-41|MPiNets trained on `goal-reach` data
-MK-MPiFormer-Pick|2024-07-14-10-20-36|MPiFormers trained on `pick` data
-MK-MPiFormer-Place|2024-07-23-19-15-15|MPiFormers trained on `place` data
-MK-MPiFormer-Goal-Reach|2024-08-01-18-50-33|MPiFormers trained on `goal-reach` data
+**1. 路由上下文 (Routing Context):**
+路由决策融合了四维度信息：
 
-### 1. Evaluatation in PyBullet
-Our evaluation in the PyBullet environment focuses on assessing whether the trajectories generated by different models adhere to physical constraints, including collision rate, joint violations, and trajectory smoothness.
+$$r^l = \text{MLP}([\phi(t), z_{\text{scene}}, \text{Pool}(h_{\text{joint}}^l), \text{Pool}(h_{\text{pose}}^l)])$$
 
-- M2Diffuser evaluation
-```bash
-bash ./scripts/model-m2diffuser/${task_type}/inference.sh ${CKPT_PATH}
-```
-> **Note:** By default, M2Diffuser is evaluated with trajectory optimization enabled. To evaluate M2Diffuser without trajectory optimization, please comment out the lines containing `planner` and `optimizer` in `./scripts/model-m2diffuser/${task_type}/inference.sh`. Here, `planner` and `optimizer` correspond to the `cost` and `energy` functions described in the [paper](https://arxiv.org/pdf/2410.11402), respectively.
+其中 $\phi(t)$ 为时间步嵌入，$z_{\text{scene}}$ 为场景潜在特征，$h_{\text{joint}}^l$ 与 $h_{\text{pose}}^l$ 为当前层的隐藏特征。
 
-- MPiNets evaluation
-```bash
-bash ./scripts/model-mpinets/${task_type}/inference.sh ${CKPT_PATH}
-```
+**2. 专家对评分 (Expert-Pair Scoring):**
+PairedRouter 为每一层构建得分矩阵：
 
-- MPiFormer evaluation
-```bash
-bash ./scripts/model-mpiformer/${task_type}/inference.sh ${CKPT_PATH}
-```
+$$S^l_{ij} = u_i(r^l) + v_j(r^l) + B_{ij}$$
 
-To enable visualization of the evaluation results, set `task.environment.viz` to `true` in `./scripts/model-${model_name}/${task_type}/inference.sh`. When you run the script, it will print a URL that you can open in a browser on the host machine to view the scene and the robot.
+训练阶段采用 Gumbel-Softmax (Straight-through) 进行近似离散采样，推理阶段采用确定性的 Top-1 / Argmax 路由。
 
-All evaluation results are saved in the `./results directory`, which follows the structure below. The file `all.json` contains aggregated evaluation results across all trajectories. The file `${task_type}_${object_name}.json` stores results for trajectories involving the same object within a specific task type, and `${id}.json` records the evaluation result of each individual trajectory.
-```bash
-./results/
-├── mk_${model_name}_${task_type}/
-│   ├── ${time_stamp}
-│   │   ├── all
-│   │   │   └── all.json
-│   │   ├── group
-│   │   │   ├── ${task_type}_${object_name}.json
-│   │   │   └── ...
-│   │   └── object
-│   │       ├── ${id}.json
-│   │       └── ...
-│   └── ...
-└── ...
-```
+**3. 损失函数约束 (Loss formulation):**
+不仅优化去噪误差，更强调路由选择与运动学结构对齐，并引入负载均衡防止专家坍塌（Expert Collapse）：
 
-### 2. Evaluatation in NVIDIA Isaac Sim
-To evaluate task success rates in NVIDIA Isaac Sim, a separate conda environment needs to be created. The evaluation code should then be run within this environment to compute the task success rates.
-- Install Tongverse
-```bash
-cd ${your_workspace}
-git clone ...
-```
+$$\mathcal{L} = \lambda_{\text{pose}} \mathcal{L}_{\text{diff\_pose}} + \lambda_{\text{joint}} \mathcal{L}_{\text{diff\_joint}} + \lambda_{\text{fk}} \mathcal{L}_{\text{fk\_route}} + \lambda_{\text{lb}} \mathcal{L}_{\text{lb}}$$
 
-Additionally, please unzip and place the USD files of the robots and scenes into the `${your_workspace}/Tongverse` directory. Of note, this path is hardcoded and does not support custom configuration.
+### 性能对比与优势 (Advantages)
 
-- Evaluate Tasks (`pick` and `place`)
-```bash
-cd ${your_workspace}/Tongverse/tv_evaluate
-python evaluate_${task_type}.py --result_dir ${your_workspace}/m2diffuser/results/${task_type}/${time_stamp} --dataset_test_dir ${your_dataset_path}/${task_type}/test 
-```
+`moe-cokin` 的核心收益来源于 **Active Path Sparsification（激活路径稀疏化）**。每次前向传播实际参与计算的子网络显著减小。
 
-The evaluation results from NVIDIA Isaac Sim will be saved to `${your_workspace}/m2diffuser/results/${task_type}/${time_stamp}/eval_res_${new_time_stamp}.json`. The `${new_time_stamp}` suffix is used to prevent repeated evaluations from overwriting previous results.
+| 维度 | Dense CoKin | `moe-cokin` |
+| --- | --- | --- |
+| **网络结构** | 双分支 Dense UNet | 双分支 MoE UNet |
+| **FFN 计算** | 全量稠密计算 | 每层仅激活选定的 Expert Pair |
+| **路由决策** | 静态无路由 | 基于 Timestep + Scene Latent + Hidden States 动态路由 |
+| **空间协同** | 依赖 FK 一致性 | FK 一致性 + **Paired Routing** |
+| **负载均衡** | N/A | $\mathcal{L}_{\text{lb}}$ 正则项防止坍塌 |
 
-### 3. Results Summary
-Aggregate and summarize the evaluation results from PyBullet and NVIDIA Isaac Sim. When selecting the evaluation file from NVIDIA Isaac Sim, remove the `${new_time_stamp}` suffix to obtain the standardized filename: `${your_workspace}/m2diffuser/results/${task_type}/${time_stamp}/eval_res.json`.
+*(注：真实计算加速收益取决于 Batch Size、Kernel 实现效率及专家调度开销，具体 Benchmark 数据见后续发布。)*
 
-Switch back to the `m2diffuser` conda environment and run the following code:
+-----
+
+## 🚀 快速开始 (Quick Start)
+
+### 1\. 环境配置 (Installation)
+
+推荐环境：`Linux` + `NVIDIA GPU` | `Python 3.8` | `PyTorch 1.13.1` | `CUDA 11.6`
 
 ```bash
-conda activate m2diffuser
-cd ${your_workspace}/postprocessing
-python eval_all_result_${task_type}_dataset.py --result_dir ../../results_dataset/${task_type}/${timestamp} --dataset_test_dir ${your_dataset_path}/${task_type}/test
+git clone [https://github.com/Haotian020527/diffuser-acceleration.git](https://github.com/Haotian020527/diffuser-acceleration.git)
+cd diffuser-acceleration
+
+# 一键安装依赖 (One-shot setup)
+bash setup_env.sh
 ```
 
-The aggregated evaluation results will be saved in the file `${your_workspace}/m2diffuser/results/${task_type}/${time_stamp}/eval_metrics.json`. The evaluation metrics recorded in this file are as follows:
+> `setup_env.sh` 将自动处理 `PointNet2 ops`, `PyTorch3D`, `Kaolin` 等复杂的 3D 依赖。
 
+### 2\. 数据与资源获取 (Data & Assets)
+
+如需复现实验，请下载以下 M2Diffuser 公开资源，并修改配置中的对应路径：
+
+  * [Dataset (Zip)](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/dataset.zip)
+  * [Checkpoints (Zip)](https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/blob/main/checkpoints.zip)
+  * [URDF & USD Assets](https://www.google.com/search?q=https://huggingface.co/datasets/M2Diffuser/mec_kinova_mobile_manipulation/tree/main) (含 Robot / Scene 的物理与渲染资产)
+
+**需修改路径的地方：**
+
+1.  `configs/task/mk_m2diffuser_goal_reach.yaml` 中的 `data_dir`。
+2.  `utils/path.py` 中的机器人及场景资源路径。
+
+### 3\. 模型训练 (Training)
+
+```bash
+# Baseline: DDPM
+bash ./scripts/model-m2diffuser/goal-reach/train.sh 1 ddpm
+
+# Baseline: Dense CoKin
+bash ./scripts/model-m2diffuser/goal-reach/train.sh 1 cokin
+
+# 推荐运行: moe-cokin
+bash ./scripts/model-m2diffuser/goal-reach/train.sh 1 moe_cokin
+
+# 从最新 Checkpoint 恢复训练 (Resume training)
+bash ./scripts/model-m2diffuser/goal-reach/train.sh 1 moe_cokin latest
 ```
-${object_name}: {
-    "% Success": xxx,
-    "Number": xxx,
-    "% With Environment Collision": xxx,
-    "% With Self Collision": xxx,
-    "% With Joint Limit Violations": xxx,
-    "Average Collision Depth (cm)": xxx,
-    "Median Collision Depth (cm)": xxx,
-    "Average Config SPARC": xxx,
-    "Average End Eff SPARC": xxx,
-    "% Smooth": xxx,
-    "Average End Eff Position Path Length": xxx,
-    "Average End Eff Orientation Path Length": xxx,
-    "Average Time": xxx,
-    "Average Time Per Step (Not Always Valuable)": xxx
-},
-...
+
+> **注意：** 当前提供的脚本默认采用**单卡训练**。由于稀疏路由在 DDP 下易触发 `find_unused_parameters` 相关问题，单卡方案是当前最稳定的公开入口。
+
+### 4\. 轻量自检与推理 (Smoke Test & Inference)
+
+**环境连通性测试：**
+
+```bash
+python scripts/test_cokin_smoke.py
 ```
 
+该脚本用于快速验证 CoKin 双分支架构与 FK 一致性计算链路是否跑通。
 
-## TODO List
-- [x] Release mobile manipulation dataset  
-- [x] Release model checkpoints
-- [ ] Release the evaluation code in NVIDIA Isaac Sim
+**推理评估：**
+若需对 `moe-cokin` 执行推理，可通过 Hydra 覆写默认配置：
 
-## Citations
-**M2Diffuser**
+```bash
+python inference_m2diffuser.py \
+    diffuser=cokin_moe \
+    model@pose_model=cokin_moe_pose_mk \
+    model@joint_model=cokin_moe_joint_mk
 ```
+
+-----
+
+## 📂 目录结构 (Repository Structure)
+
+```text
+diffuser-acceleration/
+├── configs/              # Hydra 配置目录 (diffuser, model, task)
+├── datamodule/           # 数据集封装与加载器
+├── models/
+│   ├── m2diffuser/       # 扩散模型核心 (ddpm, cokin, cokin_moe)
+│   ├── model/            # UNet 与 MoE 网络组件 (moe_unet)
+│   ├── mpiformer/        # MPiFormer 基线实现
+│   └── mpinets/          # MPiNets 基线实现
+├── preprocessing/        # 数据预处理脚本
+├── postprocessing/       # 结果聚合与可视化
+├── eval/                 # 评价指标与轨迹平滑性工具
+├── env/                  # 机器人与场景交互环境代码
+├── scripts/              # 训练、推理与测试的 Shell 脚本
+└── third_party/          # 第三方依赖封装
+```
+
+-----
+
+## 📚 引用与协议 (Citation & License)
+
+### Citation
+
+如果您在研究中使用了本仓库的代码，请引用 **M2Diffuser**：
+
+```bibtex
 @article{yan2025m2diffuser,
   title={M2Diffuser: Diffusion-based Trajectory Optimization for Mobile Manipulation in 3D Scenes},
   author={Yan, Sixu and Zhang, Zeyu and Han, Muzhi and Wang, Zaijin and Xie, Qi and Li, Zhitian and Li, Zhehan and Liu, Hangxin and Wang, Xinggang and Zhu, Song-Chun},
@@ -281,45 +216,9 @@ ${object_name}: {
 }
 ```
 
-**M3Bench**
-```
-@article{zhang2025m3bench,
-  title={M${}^{3}$Bench: Benchmarking Whole-Body Motion Generation for Mobile Manipulation in 3D Scenes},
-  author={Zhang, Zeyu and Yan, Sixu and Han, Muzhi and Wang, Zaijin and Wang, Xinggang and Zhu, Song-Chun and Liu, Hangxin},
-  journal={IEEE Robotics and Automation Letters},
-  year={2025},
-  volume={10},
-  number={7},
-  pages={7286-7293},
-  publisher={IEEE}
-}
-```
+### License
 
-**VKC**
-```
-@inproceedings{jiao2021efficient,
-  title={Efficient task planning for mobile manipulation: a virtual kinematic chain perspective},
-  author={Jiao, Ziyuan and Zhang, Zeyu and Wang, Weiqi and Han, David and Zhu, Song-Chun and Zhu, Yixin and Liu, Hangxin},
-  booktitle={2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-  pages={8288--8294},
-  year={2021},
-  organization={IEEE}
-}
-```
-```
-@inproceedings{jiao2021consolidating,
-  title={Consolidating kinematic models to promote coordinated mobile manipulations},
-  author={Jiao, Ziyuan and Zhang, Zeyu and Jiang, Xin and Han, David and Zhu, Song-Chun and Zhu, Yixin and Liu, Hangxin},
-  booktitle={2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
-  pages={979--985},
-  year={2021},
-  organization={IEEE}
-}
-```
+*Pending License Clarification.* (项目代码基于开源协议，但在正式 Release 前具体许可正在确认中。)
 
-## Acknowledgments
-
-Some codes are borrowed from [SceneDiffuser](https://github.com/scenediffuser/Scene-Diffuser/), [MPiNets](https://github.com/NVlabs/motion-policy-networks), [Decision Transformer](https://github.com/kzl/decision-transformer), [VKC](https://github.com/zyjiao4728/Planning-on-VKC), and [PhyScene](https://github.com/PhyScene/PhyScene).
-
-## License
-This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
+```
+```

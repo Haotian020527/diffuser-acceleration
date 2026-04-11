@@ -32,7 +32,7 @@ datamodule:
   test_batch_size: ${task.test.batch_size}
   use_color: true
   use_normal: false
-  data_dir: /home/lht/03Diffuser-generation/dataset/${task.type}
+  data_dir: /home/lht/01diffuser-acceleration/dataset/${task.type}
   data_dir_slurm: None
   scene_model_name: ${model.scene_model.name}
   num_scene_points: 4096
